@@ -2,9 +2,19 @@
 
 # Abstract
 
-{{< include sections/01-introduction.qmd >}}
-{{< include sections/02-methods.qmd >}}
-{{< include sections/03-results.qmd >}}
-{{< include sections/04-discussion.qmd >}}
+# Introduction
 
+# Methods
+
+# Results
+
+Parallelization with `ray` provides improved run-times across a range of different configurations.
+
+Efficiency decreases as a function of number of CPUs, but is still rather high in many configurations.
+
+Ray tends to spill a large amount of data to disk and does not clean up afterwards.
+
+![](figures/mehta_results.png)
+
+# Discussion
 
