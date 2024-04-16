@@ -1,4 +1,4 @@
 /.quarto/
 _manuscript/
 site_libs/
-.DS_Store
+*.DS_Store
