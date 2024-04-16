@@ -4,7 +4,7 @@
 
 {{< include sections/01-introduction.qmd >}}
 {{< include sections/02-methods.qmd >}}
-{{< include sections/02-results.qmd >}}
-{{< include sections/03-discussion.qmd >}}
+{{< include sections/03-results.qmd >}}
+{{< include sections/04-discussion.qmd >}}
 
 
