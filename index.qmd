@@ -18,3 +18,8 @@ Ray tends to spill a large amount of data to disk and does not clean up afterwar
 
 # Discussion
 
+
+## Acknowledgments
+
+This work was funded through NIH grant EB027585 (PI: Eleftherios Garyfallidis) and
+a grant from the Chan Zuckerberg Initiative Essential Open Source Software program (PI: Serge Koudoro).
