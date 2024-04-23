@@ -7,7 +7,7 @@ authors:
     orcid: 0000-0003-0679-1985
   - name: Asa Gilmore
     affiliation: University of Washington
-    roles: writing
+    roles: experiments, software implementation, writing
 # Add your name and metadata here:
 
 bibliography: references.bib
