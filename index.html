@@ -165,10 +165,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="introduction" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Introduction</h1>
+<p>Ray is a great system for parallelization (https://arxiv.org/abs/1712.05889).</p>
 </section>
 <section id="methods" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Methods</h1>
-<p>We ran both a constrained spherical deconvolution model and a free water diffusion tensor model through dipy on a subject from the human connectome project (add more about hcp). We created a docker image to encapsulate the test and allow for easy reproducibility of the tests. The testing program computes each model 5 times for each set of unique parameters. We then iterate across chunk sizes exponetially, from 1-15, where the number of chunks is 2^x (explain better). We ran the tests with the following arugments on docker instances with cpu counts, 8, 16, 32, 48, and 72:</p>
+<p>We ran both a constrained spherical deconvolution model and a free water diffusion tensor model through DIPY on a subject from the human connectome project (add more about hcp). We created a docker image to encapsulate the test and allow for easy reproducibility of the tests. The testing program computes each model 5 times for each set of unique parameters. We then iterate across chunk sizes exponentially, from 1-15, where the number of chunks is 2^x (explain better). We ran the tests with the following arguments on docker instances with CPU counts, 8, 16, 32, 48, and 72:</p>
 <pre><code>--models csdm fwdtim --min_chunks 1 --max_chunks 15 --num_runs 5</code></pre>
 </section>
 <section id="results" class="level1" data-number="5">
@@ -199,7 +200,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
+<p>XXX Plot peak efficiency as a function of number of CPUs for the two models. The slope is probably related to the cost-per-voxel of each model (a lot higher for FWDTI).</p>
 <p>Ray tends to spill a large amount of data to disk and does not clean up afterwards. This can quickly become problematic when running multiple consecuitive models. Withing just an hour or two of running ray could easily spill over 500gb to disk. We have implemented a fix for this within our model as follows:</p>
+<p>There seems to be an inverse relationship between the computational cost per voxel and the speedup that you get from parallelization. This is why CSD speedup is maximal for 32 cores.</p>
+<p>XXX We should try to make a theoretical guesstimate of the cost (in $) per model with the cost of different machines in mind, making some assumptions about the differences between a 32-core and a 72-core machine. We might still come out ahead using 72 CPU machines, given the cost differential in this kind of calculation..</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> engine <span class="op">==</span> <span class="st">"ray"</span>:</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> has_ray:</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> ray()</span>
