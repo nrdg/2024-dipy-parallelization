@@ -1,8 +1,5 @@
-# Towards an open-source model for data and metadata standards
+# 
 
-This repository contains the materials to generate a report following the April
-8th-9th 2024 workshop with the same title (see
-[website](https://uwescience.github.io/2024-open-source-standards-workshop/intro.html)).
 
 ## Contributing to this report
 
@@ -29,7 +26,7 @@ visiting [quarto's documentation](https://quarto.org) and particularly the
 
 ## Funding
 
-This work was funded by grant #2334483 from the U.S. National Science Foundation [Pathways to Enable Open-Source Ecosystems (POSE) program](https://new.nsf.gov/funding/initiatives/pathways-enable-open-source-ecosystems).
+This work was funded by NIH grant (2R01EB027585)[https://reporter.nih.gov/search/vXdbIqtHAU6nIA44JCLlmw/project-details/10735068] (PI: Eleftherios Garyfallidis).
 
 
 ## License
