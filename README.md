@@ -26,7 +26,7 @@ visiting [quarto's documentation](https://quarto.org) and particularly the
 
 ## Funding
 
-This work was funded by NIH grant (2R01EB027585)[https://reporter.nih.gov/search/vXdbIqtHAU6nIA44JCLlmw/project-details/10735068] (PI: Eleftherios Garyfallidis).
+This work was funded by NIH grant [2R01EB027585](https://reporter.nih.gov/search/vXdbIqtHAU6nIA44JCLlmw/project-details/10735068) (PI: Eleftherios Garyfallidis).
 
 
 ## License
