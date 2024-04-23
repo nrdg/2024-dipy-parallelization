@@ -6,21 +6,30 @@
 
 # Methods
 
+We ran both a constrained spherical deconvolution model and a free water diffusion tensor model through dipy on a subject from the human connectome project (add more about hcp). We created a docker image to encapsulate the test and allow for easy reproducibility of the tests. The testing program computes each model 5 times for each set of unique parameters. We then iterate across chunk sizes exponetially, from 1-15, where the number of chunks is 2^x (explain better). We ran the tests with the following arugments on docker instances with cpu counts, 8, 16, 32, 48, and 72:
+```
+--models csdm fwdtim --min_chunks 1 --max_chunks 15 --num_runs 5
+```
+
+
+
 # Results
 
 Parallelization with `ray` provided considerable speedups over serial excicution for both constrained sperical deconvolution models and free water models. We saw a much greater speedup for the free water model, which is possibly explained by the fact that it is much more computationally expensive per voxel. This would mean that the overhead from parallelizing the model would have a smaller effect on the runtime. Interestlingly 48 and 72 core instances performed slightly worse than the 32 core instance on the csdm model, which may indicate that there is some increased overhead for each core, separate from the overhead for each task sent to ray.
 
-![](figures/csdm_speedup.png){width=50% height=50%}
-![](figures/fwdtim_speedup.png){width=50% height=50%}
+| | |
+|-|-|
+|![](figures/csdm_speedup.png){width=80% height=80%}|![](figures/fwdtim_speedup.png){width=80% height=80%}|
 
 Efficiency decreases as a function of number of CPUs, but is still rather high in many configurations. Efficiency is also considerably higher for the free water tensor model, which is consistent with out expectations given that it is more computationally expensive per voxel and therefor ray overhead would have less effect. The high efficency of 8 core machines suggest that the most cost effective configuration for processing may be relativly cheap low core machines.
 
-![](figures/csdm_efficency.png){width=50% height=50%}
-![](figures/fwdtim_efficency.png){width=50% height=50%}
+| | |
+|-|-|
+|![](figures/csdm_efficency.png){width=80% height=80%}|![](figures/fwdtim_efficency.png){width=80% height=80%}|
 
 Ray tends to spill a large amount of data to disk and does not clean up afterwards. This can quickly become problematic when running multiple consecuitive models. Withing just an hour or two of running ray could easily spill over 500gb to disk. We have implemented a fix for this within our model as follows:
 
-```{python}
+```python
     if engine == "ray":
         if not has_ray:
             raise ray()
@@ -45,7 +54,7 @@ Ray tends to spill a large amount of data to disk and does not clean up afterwar
 ```
 
 # Discussion
-z
+
 
 ## Acknowledgments
 
