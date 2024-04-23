@@ -30,7 +30,7 @@ Efficiency decreases as a function of number of CPUs, but is still rather high i
 XXX Plot peak efficiency as a function of number of CPUs for the two models. The slope is probably related to the cost-per-voxel of each model (a lot higher for FWDTI).
 
 
-Ray tends to spill a large amount of data to disk and does not clean up afterwards. This can quickly become problematic when running multiple consecuitive models. Withing just an hour or two of running ray could easily spill over 500gb to disk. We have implemented a fix for this within our model as follows:
+Ray tends to spill a large amount of data to disk and does not clean up afterward. This can quickly become problematic when running multiple consecutive models. Within just an hour or two of running ray could easily spill over 500gb to disk. We have implemented a fix for this within our model as follows:
 
 There seems to be an inverse relationship between the computational cost per voxel and the speedup that you get from parallelization. This is why CSD speedup is maximal for 32 cores.
 
