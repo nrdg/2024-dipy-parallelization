@@ -52,6 +52,46 @@
   \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
 \fi
 
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
 
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
@@ -137,7 +177,7 @@
   pdfcreator={LaTeX via pandoc}}
 
 \title{Parallelizing DIPY model fits with Ray}
-\author{Ariel Rokem}
+\author{Ariel Rokem \and Asa Gilmore}
 \date{}
 
 \begin{document}
@@ -151,18 +191,96 @@
 
 \section{Methods}\label{methods}
 
+We ran both a constrained spherical deconvolution model and a free water
+diffusion tensor model through dipy on a subject from the human
+connectome project (add more about hcp). We created a docker image to
+encapsulate the test and allow for easy reproducibility of the tests.
+The testing program computes each model 5 times for each set of unique
+parameters. We then iterate across chunk sizes exponetially, from 1-15,
+where the number of chunks is 2\^{}x (explain better). We ran the tests
+with the following arugments on docker instances with cpu counts, 8, 16,
+32, 48, and 72:
+
+\begin{verbatim}
+--models csdm fwdtim --min_chunks 1 --max_chunks 15 --num_runs 5
+\end{verbatim}
+
 \section{Results}\label{results}
 
-Parallelization with \texttt{ray} provides improved run-times across a
-range of different configurations.
+Parallelization with \texttt{ray} provided considerable speedups over
+serial excicution for both constrained sperical deconvolution models and
+free water models. We saw a much greater speedup for the free water
+model, which is possibly explained by the fact that it is much more
+computationally expensive per voxel. This would mean that the overhead
+from parallelizing the model would have a smaller effect on the runtime.
+Interestlingly 48 and 72 core instances performed slightly worse than
+the 32 core instance on the csdm model, which may indicate that there is
+some increased overhead for each core, separate from the overhead for
+each task sent to ray.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\includegraphics[width=0.8\textwidth,height=0.8\textheight]{figures/csdm_speedup.png}
+&
+\includegraphics[width=0.8\textwidth,height=0.8\textheight]{figures/fwdtim_speedup.png} \\
+\end{longtable}
 
 Efficiency decreases as a function of number of CPUs, but is still
-rather high in many configurations.
+rather high in many configurations. Efficiency is also considerably
+higher for the free water tensor model, which is consistent with out
+expectations given that it is more computationally expensive per voxel
+and therefor ray overhead would have less effect. The high efficency of
+8 core machines suggest that the most cost effective configuration for
+processing may be relativly cheap low core machines.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\includegraphics[width=0.8\textwidth,height=0.8\textheight]{figures/csdm_efficency.png}
+&
+\includegraphics[width=0.8\textwidth,height=0.8\textheight]{figures/fwdtim_efficency.png} \\
+\end{longtable}
 
 Ray tends to spill a large amount of data to disk and does not clean up
-afterwards.
+afterwards. This can quickly become problematic when running multiple
+consecuitive models. Withing just an hour or two of running ray could
+easily spill over 500gb to disk. We have implemented a fix for this
+within our model as follows:
 
-\includegraphics{figures/mehta_results.png}
+\begin{Shaded}
+\begin{Highlighting}[]
+    \ControlFlowTok{if}\NormalTok{ engine }\OperatorTok{==} \StringTok{"ray"}\NormalTok{:}
+        \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ has\_ray:}
+            \ControlFlowTok{raise}\NormalTok{ ray()}
+
+        \ControlFlowTok{if}\NormalTok{ clean\_spill:}
+\NormalTok{            tmp\_dir }\OperatorTok{=}\NormalTok{ tempfile.TemporaryDirectory()}
+
+            \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ ray.is\_initialized():}
+\NormalTok{                ray.init(\_system\_config}\OperatorTok{=}\NormalTok{\{}
+                    \StringTok{"object\_spilling\_config"}\NormalTok{: json.dumps(}
+\NormalTok{                        \{}\StringTok{"type"}\NormalTok{: }\StringTok{"filesystem"}\NormalTok{, }\StringTok{"params"}\NormalTok{: \{}\StringTok{"directory\_path"}\NormalTok{:}
+\NormalTok{                         tmp\_dir.name\}\},}
+\NormalTok{                    )}
+\NormalTok{                \},)}
+
+\NormalTok{        func }\OperatorTok{=}\NormalTok{ ray.remote(func)}
+\NormalTok{        results }\OperatorTok{=}\NormalTok{ ray.get([func.remote(ii, }\OperatorTok{*}\NormalTok{func\_args, }\OperatorTok{**}\NormalTok{func\_kwargs)}
+                          \ControlFlowTok{for}\NormalTok{ ii }\KeywordTok{in}\NormalTok{ in\_list])}
+
+        \ControlFlowTok{if}\NormalTok{ clean\_spill:}
+\NormalTok{            shutil.rmtree(tmp\_dir.name)}
+\end{Highlighting}
+\end{Shaded}
 
 \section{Discussion}\label{discussion}
 
