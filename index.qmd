@@ -4,22 +4,27 @@
 
 # Introduction
 
+Dipy is a popular open-source Python library used for the analysis of diffusion imaging data. It provides tools for preprocessing, reconstruction, and analysis of MRI data. Here we focused on three different reconstruction (XXX need to finish testing of sfm model ) models included in Dipy, the constrained spherical deconvolution, free water diffusion tensor and sparse facile models. These reconstruction models, along with several others not tested here are good candidates for parallel computing, as they are independent on the voxel level. While in theory parallelizing these workloads should be a fairly simple task, due to pythons GIL (global interpreter lock), it can prove more difficult in practice. To work around pythons GIL we utilized the library Ray, which is a great system for parallelization of python (https://arxiv.org/abs/1712.05889). In preliminary testing, we looked at three different libraries to accomplish this task, Joblib, Dask, and Ray, but ray quickly proved to be both the most performant, as well as user-friendly and reliable option of the three. Ray's approach to serialization, the process of converting Python objects into a format that can be easily stored and transmitted (XXX improve definition of serialization), also proved to be the least prone to errors for our use case.
+
+(XXX this was written as a word dump, some of this might need to be moved to discussion or methods)
 Ray is a great system for parallelization (https://arxiv.org/abs/1712.05889).
 
 # Methods
 
-We ran both a constrained spherical deconvolution model and a free water diffusion tensor model through DIPY on a subject from the human connectome project (add more about hcp). We created a docker image to encapsulate the test and allow for easy reproducibility of the tests. The testing program computes each model 5 times for each set of unique parameters. We then iterate across chunk sizes exponentially, from 1-15, where the number of chunks is 2^x (explain better). We ran the tests with the following arguments on docker instances with CPU counts, 8, 16, 32, 48, and 72:
+We ran both a constrained spherical deconvolution model and a free water diffusion tensor model through DIPY on a subject from the human connectome project (add more about hcp). We created a docker image to encapsulate the test and allow for easy reproducibility of the tests. The testing program computes each model 5 times for each set of unique parameters. We then iterate across chunk sizes exponentially, from 1-15, where the number of chunks is 2^x (XXX explain better). We ran the tests with the following arguments on docker instances with CPU counts, 8, 16, 32, 48, and 72:
 ```
 --models csdm fwdtim --min_chunks 1 --max_chunks 15 --num_runs 5
 ```
 
 # Results
 
-Parallelization with `ray` provided considerable speedups over serial excicution for both constrained sperical deconvolution models and free water models. We saw a much greater speedup for the free water model, which is possibly explained by the fact that it is much more computationally expensive per voxel. This would mean that the overhead from parallelizing the model would have a smaller effect on the runtime. Interestlingly 48 and 72 core instances performed slightly worse than the 32 core instance on the csdm model, which may indicate that there is some increased overhead for each core, separate from the overhead for each task sent to ray.
+Parallelization with `ray` provided considerable speedups over serial execution for both constrained spherical deconvolution models and free water models. We saw a much greater speedup for the free water model, which is possibly explained by the fact that it is much more computationally expensive per voxel. This would mean that the overhead from parallelizing the model would have a smaller effect on the runtime. Interestingly 48 and 72 core instances performed slightly worse than the 32 core instances on the csdm model, which may indicate that there is some increased overhead for each core, separate from the overhead for each task sent to ray.
 
 | | |
 |-|-|
 |![](figures/csdm_speedup.png){width=80% height=80%}|![](figures/fwdtim_speedup.png){width=80% height=80%}|
+
+XXX these are too small to read
 
 Efficiency decreases as a function of number of CPUs, but is still rather high in many configurations. Efficiency is also considerably higher for the free water tensor model, which is consistent with out expectations given that it is more computationally expensive per voxel and therefor ray overhead would have less effect. The high efficency of 8 core machines suggest that the most cost effective configuration for processing may be relativly cheap low core machines.
 
@@ -27,14 +32,12 @@ Efficiency decreases as a function of number of CPUs, but is still rather high i
 |-|-|
 |![](figures/csdm_efficency.png){width=80% height=80%}|![](figures/fwdtim_efficency.png){width=80% height=80%}|
 
+XXX these are too small to read
+
 XXX Plot peak efficiency as a function of number of CPUs for the two models. The slope is probably related to the cost-per-voxel of each model (a lot higher for FWDTI).
 
 
-Ray tends to spill a large amount of data to disk and does not clean up afterwards. This can quickly become problematic when running multiple consecuitive models. Withing just an hour or two of running ray could easily spill over 500gb to disk. We have implemented a fix for this within our model as follows:
-
-There seems to be an inverse relationship between the computational cost per voxel and the speedup that you get from parallelization. This is why CSD speedup is maximal for 32 cores.
-
-XXX We should try to make a theoretical guesstimate of the cost (in \$) per model with the cost of different machines in mind, making some assumptions about the differences between a 32-core and a 72-core machine. We might still come out ahead using 72 CPU machines, given the cost differential in this kind of calculation..
+Ray tends to spill a large amount of data to disk and does not clean up afterward. This can quickly become problematic when running multiple consecutive models. Within just an hour or two of running, ray could easily spill over 500gb to disk. We have implemented a fix for this within our model as follows:
 
 ```python
     if engine == "ray":
@@ -59,6 +62,14 @@ XXX We should try to make a theoretical guesstimate of the cost (in \$) per mode
         if clean_spill:
             shutil.rmtree(tmp_dir.name)
 ```
+
+There seems to be an inverse relationship between the computational cost per voxel and the speedup that you get from parallelization. This is why CSD speedup is maximal for 32 cores.
+
+XXX We should try to make a theoretical guesstimate of the cost (in \$) per model with the cost of different machines in mind, making some assumptions about the differences between a 32-core and a 72-core machine. We might still come out ahead using 72 CPU machines, given the cost differential in this kind of calculation.
+
+We have also made a rough approximation of the total cost of computation relative to the number of CPUs. Because all tests were run on a ''c5.18xlarge'' machine, This approximation makes the following assumptions to estimate the cost of using smaller machines: It assumes that the only differentiating factor between aws c5 machines' performance is the number of CPUs, which may not be true for several reasons, such as total memory available, memory bandwidth, and single-core performance. With this approximation, we see that cost increases as a function of CPUs. This suggests that using the smallest machine that still computes in a reasonable amount of time is likely the best option.
+
+![](figures/cost_vs_cpus.png){width=80% height=80%}
 
 # Discussion
 
