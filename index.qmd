@@ -20,24 +20,21 @@ We ran both a constrained spherical deconvolution model and a free water diffusi
 
 Parallelization with `ray` provided considerable speedups over serial execution for both constrained spherical deconvolution models and free water models. We saw a much greater speedup for the free water model, which is possibly explained by the fact that it is much more computationally expensive per voxel. This would mean that the overhead from parallelizing the model would have a smaller effect on the runtime. Interestingly 48 and 72 core instances performed slightly worse than the 32 core instances on the csdm model, which may indicate that there is some increased overhead for each core, separate from the overhead for each task sent to ray.
 
-| | |
-|-|-|
-|![](figures/csdm_speedup.png){width=80% height=80%}|![](figures/fwdtim_speedup.png){width=80% height=80%}|
+![](figures/csdm_speedup.png){width=80% height=80%}
+![](figures/fwdtim_speedup.png){width=80% height=80%}
 
-XXX these are too small to read
-
-Efficiency decreases as a function of number of CPUs, but is still rather high in many configurations. Efficiency is also considerably higher for the free water tensor model, which is consistent with out expectations given that it is more computationally expensive per voxel and therefor ray overhead would have less effect. The high efficency of 8 core machines suggest that the most cost effective configuration for processing may be relativly cheap low core machines.
-
-| | |
-|-|-|
-|![](figures/csdm_efficency.png){width=80% height=80%}|![](figures/fwdtim_efficency.png){width=80% height=80%}|
-
-XXX these are too small to read
-
-XXX Plot peak efficiency as a function of number of CPUs for the two models. The slope is probably related to the cost-per-voxel of each model (a lot higher for FWDTI).
+Efficiency decreases as a function of number of CPUs, but is still rather high in many configurations. Efficiency is also considerably higher for the free water tensor model, which is consistent with our expectations given that it is more computationally expensive per voxel and therefore ray overhead would have less effect. The high efficiency of 8 core machines suggests that the most cost-effective configuration for processing may be relatively cheap low core machines.
 
 
-Ray tends to spill a large amount of data to disk and does not clean up afterward. This can quickly become problematic when running multiple consecutive models. Within just an hour or two of running, ray could easily spill over 500gb to disk. We have implemented a fix for this within our model as follows:
+![](figures/csdm_efficency.png){width=80% height=80%}
+![](figures/fwdtim_efficency.png){width=80% height=80%}
+
+We can also look at peak efficiency per core (efficiency at the optimal number of chunks for the given parameters), relative to the number of cores for both models. What's interesting is that we see a very similar relationship between both models, with the fwdti model being higher by almost the same amount for all core counts. This suggests that models such as fwdti that are more computationally expensive per voxel will see better speedups due to the overhead of parallelization being lower relative to the total cost. Interestingly increasing core counts doesn't further increase the benefit of parallelization relative to overhead, which suggests that ray overhead may be very linearly related to the number of cores.
+
+![](figures/efficency_vs_cpus.png)
+
+
+Ray tends to spill a large amount of data to the disk and does not clean up afterward. This can quickly become problematic when running multiple consecutive models. Within just an hour or two of running, Ray could easily spill over 500gb to disk. We have implemented a quick fix for this within our model as follows:
 
 ```python
     if engine == "ray":
@@ -67,7 +64,7 @@ There seems to be an inverse relationship between the computational cost per vox
 
 XXX We should try to make a theoretical guesstimate of the cost (in \$) per model with the cost of different machines in mind, making some assumptions about the differences between a 32-core and a 72-core machine. We might still come out ahead using 72 CPU machines, given the cost differential in this kind of calculation.
 
-We have also made a rough approximation of the total cost of computation relative to the number of CPUs. Because all tests were run on a ''c5.18xlarge'' machine, This approximation makes the following assumptions to estimate the cost of using smaller machines: It assumes that the only differentiating factor between aws c5 machines' performance is the number of CPUs, which may not be true for several reasons, such as total memory available, memory bandwidth, and single-core performance. With this approximation, we see that cost increases as a function of CPUs. This suggests that using the smallest machine that still computes in a reasonable amount of time is likely the best option.
+We have also made a rough approximation of the total cost of computation relative to the number of CPUs. Because all tests were run on a ''c5.18xlarge'' machine, and the docker container was simply limited in its access to cores, This approximation makes the following assumptions to estimate the cost of using smaller machines: It assumes that the only differentiating factor between aws c5 machines' performance is the number of CPUs, which may not be true for several reasons, such as total memory available, memory bandwidth, and single-core performance. With this approximation, we see that cost increases as a function of CPUs. This suggests that using the smallest machine that still computes in a reasonable amount of time is likely the best option.
 
 ![](figures/cost_vs_cpus.png){width=80% height=80%}
 
