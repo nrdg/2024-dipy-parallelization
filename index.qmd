@@ -62,8 +62,6 @@ Ray tends to spill a large amount of data to the disk and does not clean up afte
 
 There seems to be an inverse relationship between the computational cost per voxel and the speedup that you get from parallelization. This is why CSD speedup is maximal for 32 cores.
 
-XXX We should try to make a theoretical guesstimate of the cost (in \$) per model with the cost of different machines in mind, making some assumptions about the differences between a 32-core and a 72-core machine. We might still come out ahead using 72 CPU machines, given the cost differential in this kind of calculation.
-
 We have also made a rough approximation of the total cost of computation relative to the number of CPUs. Because all tests were run on a ''c5.18xlarge'' machine, and the docker container was simply limited in its access to cores, This approximation makes the following assumptions to estimate the cost of using smaller machines: It assumes that the only differentiating factor between aws c5 machines' performance is the number of CPUs, which may not be true for several reasons, such as total memory available, memory bandwidth, and single-core performance. With this approximation, we see that cost increases as a function of CPUs. This suggests that using the smallest machine that still computes in a reasonable amount of time is likely the best option.
 
 ![](figures/cost_vs_cpus.png){width=80% height=80%}
