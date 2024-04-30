@@ -67,6 +67,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script async="" src="https://hypothes.is/embed.js"></script>
 <script>
   window.document.addEventListener("DOMContentLoaded", function (_event) {
@@ -146,7 +149,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#acknowledgments" id="toc-acknowledgments" class="nav-link" data-scroll-target="#acknowledgments"><span class="header-section-number">6.1</span> Acknowledgments</a></li>
   </ul></li>
   </ul>
-<div class="quarto-alternate-notebooks"><h2>Notebooks</h2><ul><li><a href="figures/graphs-preview.html"><i class="bi bi-journal-code"></i>graphs.ipynb</a></li></ul></div></nav>
+<div class="quarto-alternate-notebooks"><h2>Notebooks</h2><ul><li><a href="figures/src/efficency_vs_cpus-preview.html"><i class="bi bi-journal-code"></i>efficency_vs_cpus.ipynb</a></li><li><a href="figures/src/graphs-preview.html"><i class="bi bi-journal-code"></i>graphs.ipynb</a></li><li><a href="figures/src/cost_analysis-preview.html"><i class="bi bi-journal-code"></i>cost_analysis.ipynb</a></li></ul></div></nav>
 </div>
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
 </div>
@@ -165,45 +168,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="introduction" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Introduction</h1>
-<p>Ray is a great system for parallelization (https://arxiv.org/abs/1712.05889).</p>
+<p>Dipy is a popular open-source Python library used for the analysis of diffusion imaging data. It provides tools for preprocessing, reconstruction, and analysis of MRI data. Here we focused on three different reconstruction (XXX need to finish testing of sfm model ) models included in Dipy, the constrained spherical deconvolution, free water diffusion tensor and sparse facile models. These reconstruction models, along with several others not tested here are good candidates for parallel computing, as they are independent on the voxel level. While in theory parallelizing these workloads should be a fairly simple task, due to pythons GIL (global interpreter lock), it can prove more difficult in practice. To work around pythons GIL we utilized the library Ray, which is a great system for parallelization of python (https://arxiv.org/abs/1712.05889). In preliminary testing, we looked at three different libraries to accomplish this task, Joblib, Dask, and Ray, but ray quickly proved to be both the most performant, as well as user-friendly and reliable option of the three. Ray’s approach to serialization, the process of converting Python objects into a format that can be easily stored and transmitted (XXX improve definition of serialization), also proved to be the least prone to errors for our use case.</p>
+<p>(XXX this was written as a word dump, some of this might need to be moved to discussion or methods) Ray is a great system for parallelization (https://arxiv.org/abs/1712.05889).</p>
 </section>
 <section id="methods" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Methods</h1>
-<p>We ran both a constrained spherical deconvolution model and a free water diffusion tensor model through DIPY on a subject from the human connectome project (add more about hcp). We created a docker image to encapsulate the test and allow for easy reproducibility of the tests. The testing program computes each model 5 times for each set of unique parameters. We then iterate across chunk sizes exponentially, from 1-15, where the number of chunks is 2^x (explain better). We ran the tests with the following arguments on docker instances with CPU counts, 8, 16, 32, 48, and 72:</p>
+<p>We ran both a constrained spherical deconvolution model and a free water diffusion tensor model through DIPY on a subject from the human connectome project (add more about hcp). We created a docker image to encapsulate the test and allow for easy reproducibility of the tests. The testing program computes each model 5 times for each set of unique parameters. We then iterate across chunk sizes exponentially, from 1-15, where the number of chunks is 2^x (XXX explain better). We ran the tests with the following arguments on docker instances with CPU counts, 8, 16, 32, 48, and 72:</p>
 <pre><code>--models csdm fwdtim --min_chunks 1 --max_chunks 15 --num_runs 5</code></pre>
 </section>
 <section id="results" class="level1" data-number="5">
 <h1 data-number="5"><span class="header-section-number">5</span> Results</h1>
-<p>Parallelization with <code>ray</code> provided considerable speedups over serial excicution for both constrained sperical deconvolution models and free water models. We saw a much greater speedup for the free water model, which is possibly explained by the fact that it is much more computationally expensive per voxel. This would mean that the overhead from parallelizing the model would have a smaller effect on the runtime. Interestlingly 48 and 72 core instances performed slightly worse than the 32 core instance on the csdm model, which may indicate that there is some increased overhead for each core, separate from the overhead for each task sent to ray.</p>
-<table class="table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><img src="figures/csdm_speedup.png" style="width:80.0%;height:80.0%"></td>
-<td><img src="figures/fwdtim_speedup.png" style="width:80.0%;height:80.0%"></td>
-</tr>
-</tbody>
-</table>
-<p>Efficiency decreases as a function of number of CPUs, but is still rather high in many configurations. Efficiency is also considerably higher for the free water tensor model, which is consistent with out expectations given that it is more computationally expensive per voxel and therefor ray overhead would have less effect. The high efficency of 8 core machines suggest that the most cost effective configuration for processing may be relativly cheap low core machines.</p>
-<table class="table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><img src="figures/csdm_efficency.png" style="width:80.0%;height:80.0%"></td>
-<td><img src="figures/fwdtim_efficency.png" style="width:80.0%;height:80.0%"></td>
-</tr>
-</tbody>
-</table>
-<p>XXX Plot peak efficiency as a function of number of CPUs for the two models. The slope is probably related to the cost-per-voxel of each model (a lot higher for FWDTI).</p>
-<p>Ray tends to spill a large amount of data to disk and does not clean up afterwards. This can quickly become problematic when running multiple consecuitive models. Withing just an hour or two of running ray could easily spill over 500gb to disk. We have implemented a fix for this within our model as follows:</p>
-<p>There seems to be an inverse relationship between the computational cost per voxel and the speedup that you get from parallelization. This is why CSD speedup is maximal for 32 cores.</p>
-<p>XXX We should try to make a theoretical guesstimate of the cost (in $) per model with the cost of different machines in mind, making some assumptions about the differences between a 32-core and a 72-core machine. We might still come out ahead using 72 CPU machines, given the cost differential in this kind of calculation..</p>
+<p>Parallelization with <code>ray</code> provided considerable speedups over serial execution for both constrained spherical deconvolution models and free water models. We saw a much greater speedup for the free water model, which is possibly explained by the fact that it is much more computationally expensive per voxel. This would mean that the overhead from parallelizing the model would have a smaller effect on the runtime. Interestingly 48 and 72 core instances performed slightly worse than the 32 core instances on the csdm model, which may indicate that there is some increased overhead for each core, separate from the overhead for each task sent to ray.</p>
+<p><img src="figures/csdm_speedup.png" style="width:80.0%;height:80.0%"> <img src="figures/fwdtim_speedup.png" style="width:80.0%;height:80.0%"></p>
+<p>Efficiency decreases as a function of number of CPUs, but is still rather high in many configurations. Efficiency is also considerably higher for the free water tensor model, which is consistent with our expectations given that it is more computationally expensive per voxel and therefore ray overhead would have less effect. The high efficiency of 8 core machines suggests that the most cost-effective configuration for processing may be relatively cheap low core machines.</p>
+<p><img src="figures/csdm_efficency.png" style="width:80.0%;height:80.0%"> <img src="figures/fwdtim_efficency.png" style="width:80.0%;height:80.0%"></p>
+<p>We can also look at peak efficiency per core (efficiency at the optimal number of chunks for the given parameters), relative to the number of cores for both models. What’s interesting is that we see a very similar relationship between both models, with the fwdti model being higher by almost the same amount for all core counts. This suggests that models such as fwdti that are more computationally expensive per voxel will see better speedups due to the overhead of parallelization being lower relative to the total cost. Interestingly increasing core counts doesn’t further increase the benefit of parallelization relative to overhead, which suggests that ray overhead may be very linearly related to the number of cores.</p>
+<p><a href="figures/efficency_vs_cpus.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="figures/efficency_vs_cpus.png" class="img-fluid"></a></p>
+<p>Ray tends to spill a large amount of data to the disk and does not clean up afterward. This can quickly become problematic when running multiple consecutive models. Within just an hour or two of running, Ray could easily spill over 500gb to disk. We have implemented a quick fix for this within our model as follows:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> engine <span class="op">==</span> <span class="st">"ray"</span>:</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> has_ray:</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> ray()</span>
@@ -225,6 +206,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> clean_spill:</span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>            shutil.rmtree(tmp_dir.name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>There seems to be an inverse relationship between the computational cost per voxel and the speedup that you get from parallelization. This is why CSD speedup is maximal for 32 cores.</p>
+<p>We have also made a rough approximation of the total cost of computation relative to the number of CPUs. Because all tests were run on a ‘’c5.18xlarge’’ machine, and the docker container was simply limited in its access to cores, This approximation makes the following assumptions to estimate the cost of using smaller machines: It assumes that the only differentiating factor between aws c5 machines’ performance is the number of CPUs, which may not be true for several reasons, such as total memory available, memory bandwidth, and single-core performance. With this approximation, we see that cost increases as a function of CPUs. This suggests that using the smallest machine that still computes in a reasonable amount of time is likely the best option.</p>
+<p><a href="figures/cost_vs_cpus.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="figures/cost_vs_cpus.png" style="width:80.0%;height:80.0%"></a></p>
 </section>
 <section id="discussion" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Discussion</h1>
@@ -646,6 +630,31 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","selector":".lightbox","loop":false,"openEffect":"zoom","descPosition":"bottom"});
+window.onload = () => {
+  lightboxQuarto.on('slide_before_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    const href = trigger.getAttribute('href');
+    if (href !== null) {
+      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+      if (imgEl !== null) {
+        const srcAttr = imgEl.getAttribute("src");
+        if (srcAttr && srcAttr.startsWith("data:")) {
+          slideConfig.href = srcAttr;
+        }
+      }
+    } 
+  });
+
+  lightboxQuarto.on('slide_after_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    if (window.Quarto?.typesetMath) {
+      window.Quarto.typesetMath(slideNode);
+    }
+  });
+
+};
+          </script>
 
 
 

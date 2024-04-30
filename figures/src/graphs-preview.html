@@ -128,7 +128,7 @@
             // if location was not changed in 100 ms, then there is no history back
             if(currentUrl === window.location.href){              
                 // redirect to site root
-                window.location.href = "../index.html";
+                window.location.href = "../../index.html";
             }
         }, 100);
       }
@@ -145,20 +145,20 @@
     </script>
 
     
-<script src="../site_libs/manuscript-notebook/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
-<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
-<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script src="../../site_libs/manuscript-notebook/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
      <script async="" src="https://hypothes.is/embed.js"></script>
 <script>
   window.document.addEventListener("DOMContentLoaded", function (_event) {
@@ -173,7 +173,7 @@
       <a onclick="window.quartoBackToArticle(); return false;" class="btn btn-primary quarto-back-link" href=""><i class="bi bi-caret-left"></i> Back to Article</a>
       <h6><i class="bi bi-journal-code"></i> graphs.ipynb</h6>
 
-            <a href="../figures/graphs.ipynb" class="btn btn-primary quarto-download-embed" download="graphs.ipynb">Download Notebook</a>
+            <a href="../../figures/src/graphs.ipynb" class="btn btn-primary quarto-download-embed" download="graphs.ipynb">Download Notebook</a>
           </div>
 
      <div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
@@ -182,7 +182,7 @@
 </div>
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
 </div>
-<main class="content quarto-banner-title-block" id="quarto-document-content">    <div class="cell-container"><div class="cell-decorator"><pre>In [1]:</pre></div><div id="cell-0" class="cell" data-execution_count="1">
+<main class="content quarto-banner-title-block" id="quarto-document-content">    <div class="cell-container"><div class="cell-decorator"><pre>In [2]:</pre></div><div id="cell-0" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> boto3</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -192,21 +192,22 @@
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    s3 <span class="op">=</span> boto3.resource(<span class="st">'s3'</span>)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    bucket <span class="op">=</span> s3.Bucket(bucket_name)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    dfs <span class="op">=</span> []  <span class="co"># an empty list to store the data frames</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    dfs <span class="op">=</span> []</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> obj <span class="kw">in</span> bucket.objects.<span class="bu">all</span>():</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> obj.key.endswith(<span class="st">'.csv'</span>):  <span class="co"># to ensure the file is a csv file</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>            data <span class="op">=</span> obj.get()[<span class="st">'Body'</span>].read().decode(<span class="st">'utf-8'</span>)  <span class="co"># get the file data</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>            df <span class="op">=</span> pd.read_csv(StringIO(data))  <span class="co"># read the CSV data as a data frame</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>            dfs.append(df)  <span class="co"># append the data frame to the list</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> obj.key.endswith(<span class="st">'.csv'</span>) <span class="kw">and</span> obj.key.startswith(<span class="st">'data'</span>):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>            data <span class="op">=</span> obj.get()[<span class="st">'Body'</span>].read().decode(<span class="st">'utf-8'</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>            df <span class="op">=</span> pd.read_csv(StringIO(data))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>            dfs.append(df)</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    final_df <span class="op">=</span> pd.concat(dfs, ignore_index<span class="op">=</span><span class="va">True</span>)  <span class="co"># concatenate all the data frames in the list</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> final_df</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> load_all_csvs_from_s3(<span class="st">'dipy-parallel-tests'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    final_df <span class="op">=</span> pd.concat(dfs, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> final_df</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> load_all_csvs_from_s3(<span class="st">'dipy-parallel-tests'</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>df.sort_values(by<span class="op">=</span><span class="st">'cpu_count'</span>, inplace<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [2]:</pre></div><div id="cell-1" class="cell" data-execution_count="2">
+<div class="cell-container"><div class="cell-decorator"><pre>In [3]:</pre></div><div id="cell-1" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -280,85 +281,85 @@
 <span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>        ax.legend()  <span class="co"># Add a legend</span></span>
 <span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>        plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+<pre><code>/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/392492796.py:58: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean, np.std]).reset_index()</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -390,7 +391,7 @@
 </div>
 </div>
 </div></div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [10]:</pre></div><div id="cell-2" class="cell" data-execution_count="10">
+<div class="cell-container"><div class="cell-decorator"><pre>In [4]:</pre></div><div id="cell-2" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -428,105 +429,105 @@
 <span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>        ax.legend()  <span class="co"># Add a legend</span></span>
 <span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>        plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:23: SettingWithCopyWarning: 
+<pre><code>/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:23: SettingWithCopyWarning: 
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   cpu_df['efficency'] = (serial_avg_time / cpu_df['time']) / cpu_count
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:23: SettingWithCopyWarning: 
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:23: SettingWithCopyWarning: 
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   cpu_df['efficency'] = (serial_avg_time / cpu_df['time']) / cpu_count
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:23: SettingWithCopyWarning: 
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:23: SettingWithCopyWarning: 
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   cpu_df['efficency'] = (serial_avg_time / cpu_df['time']) / cpu_count
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:23: SettingWithCopyWarning: 
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:23: SettingWithCopyWarning: 
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   cpu_df['efficency'] = (serial_avg_time / cpu_df['time']) / cpu_count
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:23: SettingWithCopyWarning: 
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:23: SettingWithCopyWarning: 
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   cpu_df['efficency'] = (serial_avg_time / cpu_df['time']) / cpu_count
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:23: SettingWithCopyWarning: 
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:23: SettingWithCopyWarning: 
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   cpu_df['efficency'] = (serial_avg_time / cpu_df['time']) / cpu_count
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:23: SettingWithCopyWarning: 
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:23: SettingWithCopyWarning: 
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   cpu_df['efficency'] = (serial_avg_time / cpu_df['time']) / cpu_count
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:23: SettingWithCopyWarning: 
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:23: SettingWithCopyWarning: 
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   cpu_df['efficency'] = (serial_avg_time / cpu_df['time']) / cpu_count
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:23: SettingWithCopyWarning: 
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:23: SettingWithCopyWarning: 
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   cpu_df['efficency'] = (serial_avg_time / cpu_df['time']) / cpu_count
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:23: SettingWithCopyWarning: 
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:23: SettingWithCopyWarning: 
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   cpu_df['efficency'] = (serial_avg_time / cpu_df['time']) / cpu_count
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function mean at 0x10ba693a0&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function mean at 0x10636d260&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()
-/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_35477/1098224821.py:25: FutureWarning: The provided callable &lt;function std at 0x10ba694e0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_99130/2647551254.py:25: FutureWarning: The provided callable &lt;function std at 0x10636d3a0&gt; is currently using SeriesGroupBy.std. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "std" instead.
   grouped_df = cpu_df.groupby('num_chunks')['efficency'].agg([np.mean, np.std]).reset_index()</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -544,7 +545,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </div>
 </div>
 </div></div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [1]:</pre></div><div id="cell-3" class="cell">
+<div class="cell-container"><div class="cell-decorator"><pre>In [5]:</pre></div><div id="cell-3" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>))</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cpu_count <span class="kw">in</span> cpu_counts:</span>
@@ -566,10 +567,95 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Efficiency per core'</span>)</span>
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
 <span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="graphs_files/figure-html/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="graphs_files/figure-html/cell-5-output-1.png" class="img-fluid figure-img"></a></p>
+</figure>
+</div>
+</div>
 </div></div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [2]:</pre></div><div id="cell-4" class="cell">
+<div class="cell-container"><div class="cell-decorator"><pre>In [6]:</pre></div><div id="cell-4" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the efficiency per core as the ratio of the serial time to the ray time divided by the number of CPUs</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>grouped_df[<span class="st">'mean'</span>] <span class="op">=</span> grouped_df.<span class="bu">apply</span>(<span class="kw">lambda</span> row: (serial_avg_time <span class="op">/</span> row[<span class="st">'mean'</span>]) <span class="op">/</span> row[<span class="st">'cpu_count'</span>] <span class="cf">if</span> row[<span class="st">'mean'</span>] <span class="cf">else</span> <span class="dv">0</span>, axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>KeyError: 'cpu_count'</code></pre>
+</div>
+</div></div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [9]:</pre></div><div id="cell-5" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>shapes <span class="op">=</span> df[<span class="st">'data_shape'</span>].unique()</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> shape <span class="kw">in</span> shapes:</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    shape_df <span class="op">=</span> df[df[<span class="st">'data_shape'</span>] <span class="op">==</span> shape]</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    models <span class="op">=</span> shape_df[<span class="st">'model'</span>].unique()</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> model <span class="kw">in</span> models:</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        model_df <span class="op">=</span> shape_df[shape_df[<span class="st">'model'</span>] <span class="op">==</span> model]</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        cpu_counts <span class="op">=</span> model_df[<span class="st">'cpu_count'</span>].unique()</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> cpu_count <span class="kw">in</span> cpu_counts:</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>            cpu_df <span class="op">=</span> model_df[model_df[<span class="st">'cpu_count'</span>] <span class="op">==</span> cpu_count]</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Group by num_chunks and calculate the mean time</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>            grouped_df <span class="op">=</span> cpu_df.groupby(<span class="st">'num_chunks'</span>)[<span class="st">'time'</span>].agg([np.mean]).reset_index()</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Find the num_chunks with the minimum mean time</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>            fastest_num_chunks <span class="op">=</span> grouped_df.loc[grouped_df[<span class="st">'mean'</span>].idxmin(), <span class="st">'num_chunks'</span>]</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Filter the dataframe to include only the rows with the fastest num_chunks</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>            fastest_df <span class="op">=</span> cpu_df[cpu_df[<span class="st">'num_chunks'</span>] <span class="op">==</span> fastest_num_chunks]</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Calculate the mean time for the fastest num_chunks</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>            mean_time <span class="op">=</span> fastest_df[<span class="st">'time'</span>].mean()</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>            ax.plot(cpu_count, mean_time, <span class="st">'o'</span>)</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>        ax.set_title(<span class="ss">f'Model Type </span><span class="sc">{</span>model<span class="sc">}</span><span class="ss">, Shape </span><span class="sc">{</span>shape<span class="sc">}</span><span class="ss"> (Average Time for Fastest num_chunks)'</span>)</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>        ax.set_xlabel(<span class="st">'cpu_count'</span>)</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>        ax.set_ylabel(<span class="st">'Average Time'</span>)</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>        plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_20072/744342013.py:21: FutureWarning: The provided callable &lt;function mean at 0x121c2cd60&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+  grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean]).reset_index()
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_20072/744342013.py:21: FutureWarning: The provided callable &lt;function mean at 0x121c2cd60&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+  grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean]).reset_index()
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_20072/744342013.py:21: FutureWarning: The provided callable &lt;function mean at 0x121c2cd60&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+  grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean]).reset_index()
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_20072/744342013.py:21: FutureWarning: The provided callable &lt;function mean at 0x121c2cd60&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+  grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean]).reset_index()
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_20072/744342013.py:21: FutureWarning: The provided callable &lt;function mean at 0x121c2cd60&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+  grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean]).reset_index()
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_20072/744342013.py:21: FutureWarning: The provided callable &lt;function mean at 0x121c2cd60&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+  grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean]).reset_index()
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_20072/744342013.py:21: FutureWarning: The provided callable &lt;function mean at 0x121c2cd60&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+  grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean]).reset_index()
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_20072/744342013.py:21: FutureWarning: The provided callable &lt;function mean at 0x121c2cd60&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+  grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean]).reset_index()
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_20072/744342013.py:21: FutureWarning: The provided callable &lt;function mean at 0x121c2cd60&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+  grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean]).reset_index()
+/var/folders/gb/604kkgfn2cj2q1bp1zw3t56m0000gn/T/ipykernel_20072/744342013.py:21: FutureWarning: The provided callable &lt;function mean at 0x121c2cd60&gt; is currently using SeriesGroupBy.mean. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "mean" instead.
+  grouped_df = cpu_df.groupby('num_chunks')['time'].agg([np.mean]).reset_index()</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="graphs_files/figure-html/cell-7-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="graphs_files/figure-html/cell-7-output-2.png" class="img-fluid figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="graphs_files/figure-html/cell-7-output-3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="graphs_files/figure-html/cell-7-output-3.png" class="img-fluid figure-img"></a></p>
+</figure>
+</div>
+</div>
 </div></div>
      </main>
 <!-- /main column -->  <script id="quarto-html-after-body" type="application/javascript">
@@ -980,7 +1066,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
-</script>  </div> <!-- /content -->  <script>var lightboxQuarto = GLightbox({"descPosition":"bottom","closeEffect":"zoom","openEffect":"zoom","selector":".lightbox","loop":false});
+</script>  </div> <!-- /content -->  <script>var lightboxQuarto = GLightbox({"descPosition":"bottom","selector":".lightbox","closeEffect":"zoom","openEffect":"zoom","loop":false});
 window.onload = () => {
   lightboxQuarto.on('slide_before_load', (data) => {
     const { slideIndex, slideNode, slideConfig, player, trigger } = data;
