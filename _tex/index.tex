@@ -254,6 +254,12 @@ and therefore ray overhead would have less effect. The high efficiency
 of 8 core machines suggests that the most cost-effective configuration
 for processing may be relatively cheap low core machines.
 
+Ray tends to spill a large amount of data to disk and does not clean up
+afterward. This can quickly become problematic when running multiple
+consecutive models. Within just an hour or two of running ray could
+easily spill over 500gb to disk. We have implemented a fix for this
+within our model as follows:
+
 \includegraphics[width=0.8\textwidth,height=0.8\textheight]{figures/csdm_efficency.png}
 \includegraphics[width=0.8\textwidth,height=0.8\textheight]{figures/fwdtim_efficency.png}
 

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.553">
+<meta name="generator" content="quarto-1.4.554">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -181,6 +181,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Parallelization with <code>ray</code> provided considerable speedups over serial execution for both constrained spherical deconvolution models and free water models. We saw a much greater speedup for the free water model, which is possibly explained by the fact that it is much more computationally expensive per voxel. This would mean that the overhead from parallelizing the model would have a smaller effect on the runtime. Interestingly 48 and 72 core instances performed slightly worse than the 32 core instances on the csdm model, which may indicate that there is some increased overhead for each core, separate from the overhead for each task sent to ray.</p>
 <p><img src="figures/csdm_speedup.png" style="width:80.0%;height:80.0%"> <img src="figures/fwdtim_speedup.png" style="width:80.0%;height:80.0%"></p>
 <p>Efficiency decreases as a function of number of CPUs, but is still rather high in many configurations. Efficiency is also considerably higher for the free water tensor model, which is consistent with our expectations given that it is more computationally expensive per voxel and therefore ray overhead would have less effect. The high efficiency of 8 core machines suggests that the most cost-effective configuration for processing may be relatively cheap low core machines.</p>
+<p>Ray tends to spill a large amount of data to disk and does not clean up afterward. This can quickly become problematic when running multiple consecutive models. Within just an hour or two of running ray could easily spill over 500gb to disk. We have implemented a fix for this within our model as follows:</p>
 <p><img src="figures/csdm_efficency.png" style="width:80.0%;height:80.0%"> <img src="figures/fwdtim_efficency.png" style="width:80.0%;height:80.0%"></p>
 <p>We can also look at peak efficiency per core (efficiency at the optimal number of chunks for the given parameters), relative to the number of cores for both models. What’s interesting is that we see a very similar relationship between both models, with the fwdti model being higher by almost the same amount for all core counts. This suggests that models such as fwdti that are more computationally expensive per voxel will see better speedups due to the overhead of parallelization being lower relative to the total cost. Interestingly increasing core counts doesn’t further increase the benefit of parallelization relative to overhead, which suggests that ray overhead may be very linearly related to the number of cores.</p>
 <p><a href="figures/efficency_vs_cpus.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="figures/efficency_vs_cpus.png" class="img-fluid"></a></p>
@@ -630,7 +631,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
-<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","selector":".lightbox","loop":false,"openEffect":"zoom","descPosition":"bottom"});
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","descPosition":"bottom","openEffect":"zoom","loop":false,"closeEffect":"zoom"});
 window.onload = () => {
   lightboxQuarto.on('slide_before_load', (data) => {
     const { slideIndex, slideNode, slideConfig, player, trigger } = data;
