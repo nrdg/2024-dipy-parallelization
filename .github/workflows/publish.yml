@@ -10,6 +10,12 @@ permissions:
     pages: write
 
 jobs:
+    codespell:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: codespell-project/actions-codespell@master
+
     build-deploy:
         runs-on: ubuntu-latest
         steps:
