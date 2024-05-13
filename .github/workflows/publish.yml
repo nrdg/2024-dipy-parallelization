@@ -1,7 +1,10 @@
 on:
-    push:
-      branches:
-        - main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 name: Render and Publish
 
@@ -17,6 +20,7 @@ jobs:
         - uses: codespell-project/actions-codespell@master
 
     build-deploy:
+        if: github.event.pull_request.merged == true
         runs-on: ubuntu-latest
         steps:
             - name: Check out repository
