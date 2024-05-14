@@ -34,6 +34,18 @@ We can also look at peak efficiency per core (efficiency at the optimal number o
 ![](figures/efficency_vs_cpus.png)
 
 
+We additionally ran the sparse facile model, a much computationally heavy model, which uses (sci-kit learn)[https://scikit-learn.org/stable/] under the hood to solve a set of linear equations. We ran it only on a 72-core machine. The Sparse Facile model showed a significantly slower speedup compared to both the FWDTI and CSD, with a peak speedup of 2.69 times serial execution. We initially hypothesized that sci-kit learn was performing some parallelization of its own, which would reduce the speedup seen by using ray, but upon testing serial execution on an 8-core machine we also saw that the serial execution time was unchanged by the number of cores. We are still unsure why the Sparce Facile model performs poorly on Ray.
+
+NOTE: We had one major outlier in our serial execution runs, which took nearly 50 times as long. Upon re-running our serial tests we didn't see this occur again, so we have removed it from the data.
+
+![](figures/sfm_avgtime.png){width=80% height=80%}
+
+![](figures/sfm_speedup.png){width=80% height=80%}
+
+XXX fix err bars on sfm_speedup
+
+
+
 Ray tends to spill a large amount of data to the disk and does not clean up afterward. This can quickly become problematic when running multiple consecutive models. Within just an hour or two of running, Ray could easily spill over 500gb to disk. We have implemented a quick fix for this within our model as follows:
 
 ```python
