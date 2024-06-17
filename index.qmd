@@ -4,17 +4,61 @@
 
 # Introduction
 
-Dipy is a popular open-source Python library used for the analysis of diffusion imaging data. It provides tools for preprocessing, reconstruction, and analysis of MRI data. Here we focused on three different reconstruction (XXX need to finish testing of sfm model ) models included in Dipy, the constrained spherical deconvolution, free water diffusion tensor and sparse facile models. These reconstruction models, along with several others not tested here are good candidates for parallel computing, as they are independent on the voxel level. While in theory parallelizing these workloads should be a fairly simple task, due to pythons GIL (global interpreter lock), it can prove more difficult in practice. To work around pythons GIL we utilized the library Ray, which is a great system for parallelization of python (https://arxiv.org/abs/1712.05889). In preliminary testing, we looked at three different libraries to accomplish this task, Joblib, Dask, and Ray, but ray quickly proved to be both the most performant, as well as user-friendly and reliable option of the three. Ray's approach to serialization, the process of converting Python objects into a format that can be easily stored and transmitted (XXX improve definition of serialization), also proved to be the least prone to errors for our use case.
+Dipy is a popular open-source Python library used for the analysis of diffusion imaging data. It provides tools for preprocessing, reconstruction, and analysis of MRI data. Here we focused on three different reconstruction (XXX need to finish testing of sfm model ) models included in Dipy, the constrained spherical deconvolution, free water diffusion tensor and sparse facile models. These reconstruction models, along with several others not tested here are good candidates for parallel computing, as they are independent on the voxel level. While in theory parallelizing these workloads should be a fairly simple task, due to pythons GIL (global interpreter lock), it can prove more difficult in practice. To work around pythons GIL we utilized the library Ray, which is a great system for parallelization of python (https://arxiv.org/abs/1712.05889). In preliminary testing, we looked at three different libraries to accomplish this task, Joblib, Dask, and Ray, but Ray quickly proved to be the most performant, user-friendly, and reliable option of the three. Ray's approach to serialization, the process of converting Python objects into a format that can be easily stored and transmitted (XXX improve definition of serialization), also proved to be the most compatible with our code.
 
 (XXX this was written as a word dump, some of this might need to be moved to discussion or methods)
 Ray is a great system for parallelization (https://arxiv.org/abs/1712.05889).
 
 # Methods
 
-We ran both a constrained spherical deconvolution model and a free water diffusion tensor model through DIPY on a subject from the human connectome project (add more about hcp). We created a docker image to encapsulate the test and allow for easy reproducibility of the tests. The testing program computes each model 5 times for each set of unique parameters. We then iterate across chunk sizes exponentially, from 1-15, where the number of chunks is 2^x (XXX explain better). We ran the tests with the following arguments on docker instances with CPU counts, 8, 16, 32, 48, and 72:
+We ran all tests on ec2 machines through Amazon Web Services using the C5 18xlarge spec. The C5 18xlarge spec has 72 cores and 144 gigabytes of memory. All tests were run in a docker container for easy reproducibility. The container and source code can be found here (XXX). To test different core counts the docker container was allocated cores using the cpuset argument. This ensures that all other variables, memory bandwidth, cache, ect. are kept the same. Memory was monitored on a one-second interval during the run using pythons psutil module. runtime and run parameters were recorded and automatically uploaded to an s3 bucket. (XXX info about s3 maybe unneccecary)
+
+The WU-Minn Human Connectome Project collected a dataset of 1200 healthy adults, including T1 and T2 weighted MRI and diffusion-weighted MRI. The scans have a high spatial resolution of 1.25 × 1.25 × 1.25mm<sup>3</sup>. Scans from this dataset represent a good baseline for the type of scans typically used for tractography (XXX fact check). We used subject 10307 for all tests to avoid any differences between subjects.
+
+To implement parallelization using ray for diffusion modeling we first segment the data into even chunks. Then we map the modeling function to a remote ray function and call it on each chunk. This results in an incredibly simple implementation that is easy to map onto any Python function that supports serialization via ray.
+
+```python
+func = ray.remote(func)
+results = ray.get([func.remote(ii, *func_args, **func_kwargs)
+                    for ii in in_list])
+```
+
+We ran both a constrained spherical deconvolution, free water diffusion tensor, and sparse facile model through DIPY on our subject. We fit the model 5 times for each set of unique parameters. We ran the test on chunk sizes ranging from 2<sup>1<sup> to 2<sup>15<sup> and with CPU counts, 8, 16, 32, 48, and 72. Below is the argument provided to the docker image.
+
 ```
 --models csdm fwdtim --min_chunks 1 --max_chunks 15 --num_runs 5
 ```
+
+For parallelization of tractography in pyAFQ the previous approach is not viable, as many of the libraries used for tractography are written in Cython and do not support serialization. To circumvent this issue ray support actors, which allow you to utilize stateful workers that run in a separate process. This allows you to run any code in parallel, so long as you do not need to pass any data between workers that cannot be serialzied. By leveraging the new TRX file format we were able to implement parallelization fairly easily. We do so by creating multiple tractograms that are computed in parallel, each containing a chunk of the total data. These tractograms are written straight to disk as Trx files, spare a small cache in memory. We then concatenated the resulting Trx files into a single file at the end, which proved to have minimal computational cost.
+
+This method has some downsides, such as the fact that Ray cannot dynamically allocate these tasks to workers, and instead, resources must be declared in advance. It also generally has a higher memory overhead. Despite these downsides, it yields impressive results for parallelization without any updates to the libraries used.
+
+(XXX) not sure if Code example makes sense here
+```python
+@ray.remote
+class TractActor():
+    def __init__(self):
+        self.TrxFile = TrxFile
+        self.aft = aft
+        self.objects = {}
+
+    def trx_from_lazy_tractogram(self, lazyt_id, seed, dtype_dict):
+        id = self.objects[lazyt_id]
+        return self.TrxFile.from_lazy_tractogram(
+            id,
+            seed,
+            dtype_dict=dtype_dict)
+
+    def create_lazyt(self, id, *args, **kwargs):
+        self.objects[id] = self.aft.track(*args, **kwargs)
+        return id
+
+    def delete_lazyt(self, id):
+        if id in self.objects:
+            del self.objects[id]
+```
+
+In testing, we isolate the computation of streamlines by computing the whole pipeline up to streamline generation, and then start the time and compute streamlines. We compute tractography with 1 seed per chunk, and the dmriprep preprocessing pipeline. Due to memory constraints using chunk sizes larger than ~80 streamlines causes the tracking to crash, so we iterated the test across chunk sizes of 1 to 72 (XXX sorta a lie will fix later) chunks. Similar to diffusion modeling we ran the test with CPU counts of, 8, 16, 32, and 72.
 
 # Results
 
@@ -23,7 +67,7 @@ Parallelization with `ray` provided considerable speedups over serial execution 
 ![](figures/csdm_speedup.png){width=80% height=80%}
 ![](figures/fwdtim_speedup.png){width=80% height=80%}
 
-Efficiency decreases as a function of number of CPUs, but is still rather high in many configurations. Efficiency is also considerably higher for the free water tensor model, which is consistent with our expectations given that it is more computationally expensive per voxel and therefore ray overhead would have less effect. The high efficiency of 8 core machines suggests that the most cost-effective configuration for processing may be relatively cheap low core machines.
+Efficiency decreases as a function of the number of CPUs but is still rather high in many configurations. Efficiency is also considerably higher for the free water tensor model, which is consistent with our expectations given that it is more computationally expensive per voxel and therefore ray overhead would have less effect. The high efficiency of 8-core machines suggests that the most cost-effective configuration for processing may be relatively cheap low-core machines.
 
 
 ![](figures/csdm_efficency.png){width=80% height=80%}
@@ -77,6 +121,39 @@ There seems to be an inverse relationship between the computational cost per vox
 We have also made a rough approximation of the total cost of computation relative to the number of CPUs. Because all tests were run on a ''c5.18xlarge'' machine, and the docker container was simply limited in its access to cores, This approximation makes the following assumptions to estimate the cost of using smaller machines: It assumes that the only differentiating factor between aws c5 machines' performance is the number of CPUs, which may not be true for several reasons, such as total memory available, memory bandwidth, and single-core performance. With this approximation, we see that cost increases as a function of CPUs. This suggests that using the smallest machine that still computes in a reasonable amount of time is likely the best option.
 
 ![](figures/cost_vs_cpus.png){width=80% height=80%}
+
+
+We have also utilized ray to parallelize tractography in pyAFQ. Tractography is a similarly "embarrassingly parallel" task, where you have many streamlines that can be computed independently of each other. To parallelize tractography we utilized rays [actors](https://docs.ray.io/en/latest/ray-core/actors.html), which are stateful workers. These proved particularly useful as they allow us to avoid serialization of the large python objects used to compute tractography, by encapsulating the objects inside an actor such that they are not passed in or out of the actor and are instead accessed using helper methods.
+
+![](figures/pyAFQ_speedup.png)
+
+```python
+@ray.remote
+class TractActor():
+    def __init__(self):
+        self.TrxFile = TrxFile
+        self.aft = aft
+        self.objects = {}
+
+    def trx_from_lazy_tractogram(self, lazyt_id, seed, dtype_dict):
+        id = self.objects[lazyt_id]
+        return self.TrxFile.from_lazy_tractogram(
+            id,
+            seed,
+            dtype_dict=dtype_dict)
+
+    def create_lazyt(self, id, *args, **kwargs):
+        self.objects[id] = self.aft.track(*args, **kwargs)
+        return id
+
+    def delete_lazyt(self, id):
+        if id in self.objects:
+            del self.objects[id]
+```
+
+The [TRX](https://github.com/tee-ar-ex/trx-python) file format also proved very useful. To avoid having multiple workers write to the same object we have each worker write to its own TRX file on disk, and then at the end, all files are concatenated into one. This proved to be a very robust solution that still has fairly low memory usage.
+
+![](figures/pyAFQ_memory.png)
 
 # Discussion
 
